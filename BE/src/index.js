@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 const quizRoutes = require('./resources/routes/quizzes');
 const questionRoutes = require('./resources/routes/question');
 
@@ -16,12 +17,13 @@ app.use('/',(req, res) => {
 
 
 
-mongoose.connect('mongodb+srv://anhphucpro13:123456a@cluster0.r2atg.mongodb.net/SDN_ASS1', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error(err));
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.listen((port, ) => {
+
+app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });

@@ -7,7 +7,9 @@ const quizRoutes = require('./resources/routes/quizzes');
 const questionRoutes = require('./resources/routes/question');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.REACT_APP_SERVER_URL,
+}));
 app.use(bodyParser.json());
 
 app.use('/quizzes', quizRoutes);

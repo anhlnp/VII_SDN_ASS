@@ -37,4 +37,31 @@ router.post('/:quizId/question', async (req, res) => {
     res.status(201).json(question);
 });
 
+// PUT /quizzes/:quizId - Update a quiz by ID
+router.put('/:quizId', async (req, res) => {
+    const { title, description } = req.body;
+
+    // Validate the incoming data
+    if (!title || !description) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        const updatedQuiz = await Quiz.findByIdAndUpdate(
+            req.params.quizId, 
+            { title, description }, 
+            { new: true }
+        );
+        
+        if (!updatedQuiz) {
+            return res.status(404).json({ error: 'Quiz not found' });
+        }
+
+        res.status(200).json(updatedQuiz);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update quiz' });
+    }
+});
+
+
 module.exports = router;

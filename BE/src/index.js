@@ -6,7 +6,7 @@ require('dotenv').config();
 const quizRoutes = require('./resources/routes/quizzes');
 const questionRoutes = require('./resources/routes/question');
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 const app = express();
 
@@ -31,7 +31,6 @@ const corsOptions = {
 
 // Use the `corsOptions` for CORS middleware
 app.use(cors(corsOptions));
-
 // Handle preflight requests with the same `corsOptions`
 app.options('*', cors(corsOptions));
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { updateQuestion } from '../../services/api';
-
+import Button from '../../styles/Button';
 // Styled components for modal and form
 const StyledModal = styled(Modal)`
   position: absolute;
@@ -34,17 +34,6 @@ const Select = styled.select`
   border-radius: 4px;
 `;
 
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
 
 const EditQuestion = ({ question, onQuestionUpdated, isOpen, toggleModal }) => {
   const [text, setText] = useState(question.text);
@@ -134,10 +123,10 @@ const EditQuestion = ({ question, onQuestionUpdated, isOpen, toggleModal }) => {
           />
         </label>
 
-        <StyledButton type="submit">Update Question</StyledButton>
-        <StyledButton type="button" onClick={toggleModal} style={{ marginLeft: '10px' }}>
+        <Button type="submit">Update Question</Button>
+        <Button type="button" onClick={toggleModal} style={{ marginLeft: '10px' }}>
           Cancel
-        </StyledButton>
+        </Button>
       </form>
     </StyledModal>
   );

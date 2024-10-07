@@ -5,7 +5,7 @@ import AddQuestionToQuiz from "../question/AddQuestionToQuiz";
 import EditQuestion from "../question/EditQuestion";
 import styled from "styled-components";
 import Modal from "react-modal";
-
+import Button from "../../styles/Button";
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -51,20 +51,6 @@ const OptionItem = styled.li`
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
-`;
-
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
 `;
 
 const LoadingText = styled.p`
@@ -143,14 +129,15 @@ const QuizDetail = () => {
               </p>
 
               <ButtonGroup>
-                <StyledButton onClick={() => openEditModal(question)}>
+                <Button onClick={() => openEditModal(question)}>
                   Edit
-                </StyledButton>
-                <StyledButton
+                </Button>
+                <Button
                   onClick={() => handleDeleteQuestion(question._id)}
+                  variant="delete"
                 >
                   Delete
-                </StyledButton>
+                </Button>
               </ButtonGroup>
             </QuestionItem>
           ))}

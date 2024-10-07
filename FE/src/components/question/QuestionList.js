@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Modal from "react-modal";
 import { getQuestions, deleteQuestion } from '../../services/api';
 import EditQuestion from './EditQuestion';
-
+import Button from '../../styles/Button';
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -18,18 +18,6 @@ const Title = styled.h1`
   margin-bottom: 20px;
 `;
 
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  margin: 5px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
 
 const QuestionItem = styled.li`
   margin: 15px 0;
@@ -103,14 +91,14 @@ const QuestionList = () => {
   return (
     <Container>
       <Title>Questions</Title>
-      {/* <StyledButton onClick={() => >Add Question</StyledButton> */}
+      {/* <Button onClick={() => >Add Question</Button> */}
       <ul>
         {questions.map(question => (
           <QuestionItem key={question._id}>
             <QuestionText>{question.text}</QuestionText>
             <ButtonGroup>
-              {/* <StyledButton onClick={() => openEditModal(question)}>Edit</StyledButton> */}
-              <StyledButton onClick={() => handleDelete(question._id)}>Delete</StyledButton>
+              {/* <Button onClick={() => openEditModal(question)}>Edit</Button> */}
+              <Button onClick={() => handleDelete(question._id)} variant='delete'>Delete</Button>
             </ButtonGroup>
           </QuestionItem>
         ))}

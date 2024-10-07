@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { createQuestion } from '../../services/api';
-
+import Button from '../../styles/Button';
 // Define styled components
 const StyledModal = styled(Modal)`
   position: absolute;
@@ -12,41 +12,56 @@ const StyledModal = styled(Modal)`
   bottom: auto;
   transform: translate(-50%, -50%);
   width: 500px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+  padding: 30px 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  max-height: 80vh;
+  overflow-y: auto;
+
+  h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #333;
+    text-align: center;
+  }
 `;
 
 const Input = styled.input`
-  margin-bottom: 10px;
-  padding: 10px;
+  margin-bottom: 15px;
+  padding: 12px;
   font-size: 1em;
   width: 100%;
   border: 1px solid #ddd;
-  border-radius: 4px;
-`;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
 
-const TextArea = styled.textarea`
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1em;
-  width: 100%;
-  height: 100px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
+  &:focus {
+    border-color: #007bff;
   }
+`;
+
+const Select = styled.select`
+  margin-bottom: 15px;
+  padding: 12px;
+  font-size: 1em;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: #007bff;
+  }
+`;
+
+const Label = styled.label`
+  font-size: 1em;
+  margin-bottom: 8px;
+  color: #555;
+  display: block;
 `;
 
 const AddQuestionToQuiz = ({ quizId, onQuestionAdded }) => {
@@ -74,7 +89,7 @@ const AddQuestionToQuiz = ({ quizId, onQuestionAdded }) => {
     };
 
     try {
-      const response = await createQuestion(quizId, questionData); // Pass quizId to the function
+      await createQuestion(quizId, questionData); // Pass quizId to the function
       onQuestionAdded(); // Refresh quiz details
       // Clear form fields after adding the question
       setText('');
@@ -95,7 +110,7 @@ const AddQuestionToQuiz = ({ quizId, onQuestionAdded }) => {
   return (
     <>
       {/* Button to open the modal */}
-      <StyledButton onClick={toggleModal}>Add New Question</StyledButton>
+      <Button onClick={toggleModal} variant="submit">Add New Question</Button>
 
       {/* Modal Component */}
       <StyledModal
@@ -106,57 +121,51 @@ const AddQuestionToQuiz = ({ quizId, onQuestionAdded }) => {
       >
         <h2>Create New Question</h2>
         <form onSubmit={handleSubmit}>
-          <label>
-            Question Text:
-            <Input
-              type="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Enter the question"
-            />
-          </label>
+          <Label>Question Text:</Label>
+          <Input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Enter the question"
+          />
 
           <h4>Options</h4>
           {options.map((option, index) => (
-            <label key={index}>
-              Option {index + 1}:
+            <div key={index}>
+              <Label>Option {index + 1}:</Label>
               <Input
                 type="text"
                 value={option}
                 onChange={(e) => handleOptionChange(index, e.target.value)}
                 placeholder={`Option ${index + 1}`}
               />
-            </label>
+            </div>
           ))}
 
-          <label>
-            Correct Answer:
-            <select
-              value={correctAnswerIndex}
-              onChange={(e) => setCorrectAnswerIndex(parseInt(e.target.value))}
-            >
-              {options.map((_, index) => (
-                <option key={index} value={index}>
-                  Option {index + 1}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Label>Correct Answer:</Label>
+          <Select
+            value={correctAnswerIndex}
+            onChange={(e) => setCorrectAnswerIndex(parseInt(e.target.value))}
+          >
+            {options.map((_, index) => (
+              <option key={index} value={index}>
+                Option {index + 1}
+              </option>
+            ))}
+          </Select>
 
-          <label>
-            Keywords (comma-separated):
-            <Input
-              type="text"
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder="Enter keywords (e.g., keyword1, keyword2)"
-            />
-          </label>
+          <Label>Keywords (comma-separated):</Label>
+          <Input
+            type="text"
+            value={keywords}
+            onChange={(e) => setKeywords(e.target.value)}
+            placeholder="Enter keywords (e.g., keyword1, keyword2)"
+          />
 
-          <StyledButton type="submit">Add Question</StyledButton>
-          <StyledButton type="button" onClick={toggleModal} style={{ marginLeft: '10px' }}>
+          <Button type="submit" variant="submit">Add Question</Button>
+          <Button type="button" onClick={toggleModal} variant='delete'>
             Cancel
-          </StyledButton>
+          </Button>
         </form>
       </StyledModal>
     </>

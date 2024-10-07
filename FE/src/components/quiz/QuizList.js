@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { createQuiz, getQuizzes, deleteQuiz, updateQuiz } from '../../services/api';
-
+import Button from '../../styles/Button';
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -34,19 +34,6 @@ const QuizTitle = styled.h3`
 
 const QuizDescription = styled.p`
   margin: 10px 0;
-`;
-
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  margin: 5px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
 `;
 
 const Form = styled.form`
@@ -149,15 +136,15 @@ const QuizList = () => {
   return (
     <Container>
       <Title>Quiz List</Title>
-      <StyledButton onClick={() => setIsModalOpen(true)}>Add Quiz</StyledButton>
+      <Button onClick={() => setIsModalOpen(true)} variant="submit" >Add Quiz</Button>
       <ul>
         {quizzes.map(quiz => (
           <QuizItem key={quiz._id}>
             <QuizTitle>{quiz.title}</QuizTitle>
             <QuizDescription>{quiz.description}</QuizDescription>
-            <StyledButton onClick={() => handleEditClick(quiz)}>Edit</StyledButton>
-            <StyledButton onClick={() => handleDelete(quiz._id)}>Delete</StyledButton>
-            <StyledButton onClick={() => navigate(`/quizzes/${quiz._id}`)}>View Details</StyledButton>
+            <Button onClick={() => handleEditClick(quiz)}>Edit</Button>
+            <Button onClick={() => handleDelete(quiz._id)} variant="delete"  >Delete</Button>
+            <Button onClick={() => navigate(`/quizzes/${quiz._id}`)} variant="confirm">View Details</Button>
           </QuizItem>
         ))}
       </ul>
@@ -181,10 +168,10 @@ const QuizList = () => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Quiz Description"
           />
-          <StyledButton type="submit">Add Quiz</StyledButton>
+          <Button type="submit">Add Quiz</Button>
         </Form>
         
-        <StyledButton onClick={() => setIsModalOpen(false)}>Close</StyledButton>
+        <Button onClick={() => setIsModalOpen(false)}>Close</Button>
       </StyledModal>
 
       {/* Edit Quiz Modal */}
@@ -206,9 +193,9 @@ const QuizList = () => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Quiz Description"
           />
-          <StyledButton type="submit">Update Quiz</StyledButton>
+          <Button type="submit">Update Quiz</Button>
         </Form>
-        <StyledButton onClick={() => setIsEditModalOpen(false)}>Close</StyledButton>
+        <Button onClick={() => setIsEditModalOpen(false)}>Close</Button>
       </StyledModal>
     </Container>
   );

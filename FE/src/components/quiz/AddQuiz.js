@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { createQuiz } from '../../services/api';
-
+import Button from '../../styles/Button';
 // Define styled components
 const StyledModal = styled(Modal)`
   position: absolute;
@@ -37,18 +37,6 @@ const TextArea = styled.textarea`
   border-radius: 4px;
 `;
 
-const StyledButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
 const AddQuiz = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -78,7 +66,7 @@ const AddQuiz = () => {
   return (
     <>
       {/* Button to open the modal */}
-      <StyledButton onClick={toggleModal}>Create New Quiz</StyledButton>
+      <Button onClick={toggleModal}>Create New Quiz</Button>
 
       {/* Modal Component */}
       <StyledModal
@@ -100,10 +88,10 @@ const AddQuiz = () => {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Quiz Description"
           />
-          <StyledButton type="submit">Add Quiz</StyledButton>
-          <StyledButton type="button" onClick={toggleModal} style={{ marginLeft: '10px' }}>
+          <Button type="submit" variant="submit">Add Quiz</Button>
+          <Button onClick={toggleModal} variant='delete' style={{ marginLeft: '10px' }} >
             Cancel
-          </StyledButton>
+          </Button>
         </form>
       </StyledModal>
     </>

@@ -7,11 +7,13 @@ const quizRoutes = require('./resources/routes/quizzes');
 const questionRoutes = require('./resources/routes/question');
 
 const app = express();
-app.use(cors({
-origin: process.env.REACT_APP_SERVER_URL,
-methods: ['GET', 'POST', 'PUT'],
-allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(cors(
+//     {
+// origin: process.env.REACT_APP_SERVER_URL,
+// methods: ['GET', 'POST', 'PUT'],
+// allowedHeaders: ['Content-Type', 'Authorization'],
+// }
+));
 app.use(bodyParser.json());
 
 app.use('/quizzes', quizRoutes);

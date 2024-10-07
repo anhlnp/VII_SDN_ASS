@@ -2,7 +2,7 @@ import axios from "axios";
 
 // const API_URL = 'https://vii-sdn-ass.onrender.com';
 
-const API_URL = process.env.REACT_APP_API_URL || 3000; // Replace with your server URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'; // Replace with your server URL
 
 // Quizzes API
 export const getQuizzes = () => axios.get(`${API_URL}/quizzes`);

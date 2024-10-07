@@ -8,7 +8,9 @@ const questionRoutes = require('./resources/routes/question');
 
 const app = express();
 app.use(cors({
-    origin: process.env.REACT_APP_SERVER_URL,
+origin: process.env.REACT_APP_SERVER_URL,
+methods: GET, POST, PUT
+// Access-Control-Allow-Headers: process.env.REACT_APP_SERVER_URL,
 }));
 app.use(bodyParser.json());
 

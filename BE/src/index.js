@@ -12,7 +12,7 @@ const app = express();
 
 const allowedOrigins = [process.env.REACT_APP_SERVER_URL];
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
@@ -27,7 +27,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
   allowedHeaders: ['X-Requested-With', 'Content-Type', 'Authorization'],
   credentials: true,
-}));
+};
+
+// Use the `corsOptions` for CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests with the same `corsOptions`
+app.options('*', cors(corsOptions));
+
 
 app.use(bodyParser.json());
 

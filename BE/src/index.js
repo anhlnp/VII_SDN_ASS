@@ -10,7 +10,7 @@ const app = express();
 app.use(cors({
 origin: process.env.REACT_APP_SERVER_URL,
 methods: ['GET', 'POST', 'PUT'],
-// Access-Control-Allow-Headers: process.env.REACT_APP_SERVER_URL,
+allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(bodyParser.json());
 

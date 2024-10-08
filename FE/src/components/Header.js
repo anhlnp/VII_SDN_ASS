@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 // Fixed position header
 const HeaderContainer = styled.header`
@@ -43,21 +43,15 @@ const NavLinks = styled.div`
 `;
 
 const Header = () => {
-  const navigate = useNavigate();
-
-  const handleNavigation = (path) => (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    navigate(path);
-  };
-
   return (
     <HeaderContainer>
       <NavContainer>
         <Logo>PAQuiz</Logo>
         <NavLinks>
-          <a href="#" onClick={handleNavigation('/')}>Home</a>
-          <a href="#" onClick={handleNavigation('/quizzes')}>Quizzes</a>
-          <a href="#" onClick={handleNavigation('/questions')}>Questions</a>
+          {/* Use Link components for client-side navigation */}
+          <Link to="/">Home</Link>
+          <Link to="/quizzes">Quizzes</Link>
+          <Link to="/questions">Questions</Link>
         </NavLinks>
       </NavContainer>
     </HeaderContainer>

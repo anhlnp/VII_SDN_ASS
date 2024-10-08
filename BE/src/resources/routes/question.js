@@ -6,8 +6,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const questions = await Question.find();
-        res.json(questions);
+        res.status(200).json(questions);
     } catch (error) {
+        console.error('Error fetching questions:', error);
         res.status(500).json({ error: 'Failed to fetch questions' });
     }
 });
@@ -22,12 +23,18 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        // Check if the question already exists
+        const existingQuestion = await Question.findOne({ text });
+        if (existingQuestion) {
+            return res.status(400).json({ error: 'Question with this text already exists' });
+        }
+
         // Create a new question
         const newQuestion = new Question({
             text,
             options,
             keywords: keywords || [], // Set an empty array if keywords are not provided
-            correctAnswerIndex
+            correctAnswerIndex,
         });
 
         // Save the question to the database
@@ -35,6 +42,7 @@ router.post('/', async (req, res) => {
 
         res.status(201).json(savedQuestion);
     } catch (error) {
+        console.error('Error adding question:', error);
         res.status(500).json({ error: 'Failed to add question' });
     }
 });
@@ -42,9 +50,13 @@ router.post('/', async (req, res) => {
 // DELETE /questions/:questionId - Delete a question by ID
 router.delete('/:questionId', async (req, res) => {
     try {
-        await Question.findByIdAndDelete(req.params.questionId);
+        const deletedQuestion = await Question.findByIdAndDelete(req.params.questionId);
+        if (!deletedQuestion) {
+            return res.status(404).json({ error: 'Question not found' });
+        }
         res.status(204).send();
     } catch (error) {
+        console.error('Error deleting question:', error);
         res.status(500).json({ error: 'Failed to delete question' });
     }
 });
@@ -65,11 +77,15 @@ router.put('/:questionId', async (req, res) => {
             { new: true }
         );
         
+        if (!updatedQuestion) {
+            return res.status(404).json({ error: 'Question not found' });
+        }
+
         res.status(200).json(updatedQuestion);
     } catch (error) {
+        console.error('Error updating question:', error);
         res.status(500).json({ error: 'Failed to update question' });
     }
 });
-
 
 module.exports = router;

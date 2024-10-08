@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
 import styled from "styled-components";
 import {
   createQuiz,
@@ -10,8 +9,8 @@ import {
 } from "../../services/api";
 import Button from "../../styles/Button";
 import ConfirmDelete from "../ConfirmDelete";
-import EditQuizModal from "./EditQuizModal";
-import AddQuiz from "./AddQuiz";
+import ModalCreateEditQuiz from "./ModalCreateEditQuiz"; // Import the CombinedModal
+
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -44,52 +43,18 @@ const QuizDescription = styled.p`
   margin: 10px 0;
 `;
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
+  justify-content: flex-end;
 `;
-
-const Input = styled.input`
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1em;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const TextArea = styled.textarea`
-  margin-bottom: 10px;
-  padding: 10px;
-  font-size: 1em;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const StyledModal = styled(Modal)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 500px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-`;
-
-Modal.setAppElement("#root");
 
 const QuizList = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [currentQuizId, setCurrentQuizId] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
-  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalAction, setModalAction] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -105,54 +70,58 @@ const QuizList = () => {
     }
   };
 
-  const handleAddQuiz = async (quizData) => {
-    try {
-      await createQuiz(quizData);
-      fetchQuizzes(); // Refresh the quiz list after adding
-    } catch (error) {
-      console.error("Failed to add quiz", error);
-    }
+  // Handle Add Quiz
+  const handleAddQuizClick = () => {
+    setSelectedQuiz(null);
+    setModalTitle("Create New Quiz");
+    setModalAction("create");
+    setIsModalOpen(true);
   };
 
-  const handleUpdateQuiz = async (quizId, updatedQuizData) => {
-    try {
-      await updateQuiz(quizId, updatedQuizData);
-      fetchQuizzes(); // Refresh the quiz list after updating
-    } catch (error) {
-      console.error("Failed to update quiz", error);
-    }
+  // Handle Edit Quiz
+  const handleEditQuizClick = (quiz) => {
+    setSelectedQuiz(quiz);
+    setModalTitle("Edit Quiz");
+    setModalAction("edit");
+    setIsModalOpen(true);
   };
 
-  const handleEditClick = (quiz) => {
-    setCurrentQuiz(quiz);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (quiz) => {
-    setCurrentQuizId(quiz._id);
-    setCurrentQuiz(quiz); // Store the current quiz for title reference
+  // Handle Delete Quiz
+  const handleDeleteQuizClick = (quiz) => {
+    setSelectedQuiz(quiz);
     setIsDeleteModalOpen(true);
   };
 
+  // Submit handler for Add/Edit
+  const handleSubmit = async (data) => {
+    try {
+      if (modalAction === "create") {
+        await createQuiz(data);
+      } else if (modalAction === "edit") {
+        await updateQuiz(selectedQuiz._id, data);
+      }
+      fetchQuizzes();
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Failed to save quiz", error);
+    }
+  };
+
+  // Confirm Delete
   const handleConfirmDelete = async () => {
     try {
-      await deleteQuiz(currentQuizId);
-      setQuizzes(quizzes.filter((quiz) => quiz._id !== currentQuizId));
+      await deleteQuiz(selectedQuiz._id);
+      setQuizzes(quizzes.filter((quiz) => quiz._id !== selectedQuiz._id));
     } catch (error) {
       console.error("Failed to delete quiz", error);
     }
     setIsDeleteModalOpen(false);
   };
 
-  const handleCloseDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-  };
-
-
   return (
     <Container>
       <Title>Quiz List</Title>
-      <Button onClick={() => setIsModalOpen(true)} variant="submit">
+      <Button onClick={handleAddQuizClick} variant="submit">
         Add Quiz
       </Button>
       <ul>
@@ -160,43 +129,45 @@ const QuizList = () => {
           <QuizItem key={quiz._id}>
             <QuizTitle>{quiz.title}</QuizTitle>
             <QuizDescription>{quiz.description}</QuizDescription>
-            <Button onClick={() => handleEditClick(quiz)}>Edit</Button>
-            <Button onClick={() => handleDeleteClick(quiz)} variant="delete">
-              Delete
-            </Button>
-            <Button
-              onClick={() => navigate(`/quizzes/${quiz._id}`)}
-              variant="confirm"
-            >
-              View Details
-            </Button>
+            <ButtonGroup>
+              <Button onClick={() => handleEditQuizClick(quiz)}>Edit</Button>
+              <Button
+                onClick={() => handleDeleteQuizClick(quiz)}
+                variant="delete"
+              >
+                Delete
+              </Button>
+              <Button
+                onClick={() => navigate(`/quizzes/${quiz._id}`)}
+                variant="confirm"
+              >
+                View Details
+              </Button>
+            </ButtonGroup>
           </QuizItem>
         ))}
       </ul>
 
-      {/* Add Quiz Modal */}
-      <AddQuiz
+      {/* Combined Modal for Add/Edit Quiz */}
+      <ModalCreateEditQuiz
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddQuiz={handleAddQuiz}
+        onSubmit={handleSubmit}
+        title={modalTitle}
+        fields={[
+          { name: "title", type: "text", placeholder: "Quiz Title" },
+          { name: "description", type: "textarea", placeholder: "Quiz Description" },
+        ]}
+        values={selectedQuiz}
+        submitButtonText={modalAction === "create" ? "Create Quiz" : "Update Quiz"}
       />
-
-       {/* Edit Quiz Modal */}
-       {setCurrentQuiz && (
-        <EditQuizModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          quizData={currentQuiz}
-          onUpdateQuiz={handleUpdateQuiz}
-        />
-      )}
 
       {/* Confirm Delete Modal */}
       <ConfirmDelete
         isOpen={isDeleteModalOpen}
-        onClose={handleCloseDeleteModal}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
-        message={`Are you sure you want to delete <strong>${currentQuiz?.title}</strong>?`}
+        message={`Are you sure you want to delete <strong>${selectedQuiz?.title}</strong>?`}
       />
     </Container>
   );

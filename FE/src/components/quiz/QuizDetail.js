@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getQuiz, deleteQuestion } from "../../services/api";
-import AddQuestionToQuiz from "../question/AddQuestionToQuiz";
-import EditQuestion from "../question/EditQuestion";
 import styled from "styled-components";
-import Modal from "react-modal";
 import Button from "../../styles/Button";
 import ConfirmDelete from "../ConfirmDelete";
+import ModalAddEditQuestion from "../question/ModalAddEditQuestion";
 
 // Styled components
 const Container = styled.div`
@@ -52,6 +50,7 @@ const OptionItem = styled.li`
 
 const ButtonGroup = styled.div`
   display: flex;
+  justify-content: flex-end;
 `;
 
 const LoadingText = styled.p`
@@ -64,10 +63,10 @@ const QuizDetail = () => {
   const { id } = useParams();
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const fetchQuiz = async () => {
     try {
@@ -84,14 +83,25 @@ const QuizDetail = () => {
     fetchQuiz();
   }, [id]);
 
+  const handleAddQuestion = () => {
+    setIsEditMode(false);
+    setCurrentQuestion(null); // Clear any existing question data
+    setIsModalOpen(true);
+  };
+
+  const handleEditQuestion = (question) => {
+    setIsEditMode(true);
+    setCurrentQuestion(question);
+    setIsModalOpen(true);
+  };
   const handleDeleteClick = (question) => {
-    setCurrentQuestion(question);  // Set the question to be deleted
-    setIsDeleteModalOpen(true);    // Open the delete confirmation modal
+    setCurrentQuestion(question); // Set the question to be deleted
+    setIsDeleteModalOpen(true); // Open the delete confirmation modal
   };
 
   const handleConfirmDelete = async () => {
     try {
-      await deleteQuestion(currentQuestion._id);  // Use the correct question ID
+      await deleteQuestion(currentQuestion._id); // Use the correct question ID
       fetchQuiz(); // Refresh quiz details after deleting a question
     } catch (error) {
       console.error("Failed to delete question", error);
@@ -103,16 +113,6 @@ const QuizDetail = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const openEditModal = (question) => {
-    setCurrentQuestion(question);  // Set the current question for editing
-    setIsEditModalOpen(true);      // Open the edit modal
-  };
-
-  const closeEditModal = () => {
-    setIsEditModalOpen(false);     // Close the edit modal
-    setEditingQuestionId(null);
-  };
-
   if (loading) return <LoadingText>Loading...</LoadingText>;
   if (!quiz) return <p>Quiz not found</p>;
 
@@ -122,7 +122,8 @@ const QuizDetail = () => {
       <Description>{quiz.description}</Description>
 
       <h3>Questions</h3>
-      <AddQuestionToQuiz quizId={quiz._id} onQuestionAdded={fetchQuiz} />
+      <Button onClick={handleAddQuestion}>Add Question</Button>
+
       {quiz.questions.length === 0 ? (
         <p>No questions available for this quiz.</p>
       ) : (
@@ -142,7 +143,7 @@ const QuizDetail = () => {
               </p>
 
               <ButtonGroup>
-                <Button onClick={() => openEditModal(question)}>
+                <Button onClick={() => handleEditQuestion(question)}>
                   Edit
                 </Button>
                 <Button
@@ -157,39 +158,14 @@ const QuizDetail = () => {
         </QuestionList>
       )}
 
-      {/* Edit Question Modal */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onRequestClose={closeEditModal}
-        contentLabel="Edit Question"
-        ariaHideApp={false}
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            transform: "translate(-50%, -50%)",
-            width: "500px",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-          },
-        }}
-      >
-        {currentQuestion && (
-          <EditQuestion
-            question={currentQuestion}
-            onQuestionUpdated={() => {
-              fetchQuiz(); // Refresh quiz details
-              closeEditModal(); // Close modal after editing
-            }}
-            isOpen={isEditModalOpen}
-            toggleModal={closeEditModal}
-          />
-        )}
-      </Modal>
-
+      <ModalAddEditQuestion
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isEditMode={isEditMode}
+        quizId={id}
+        question={currentQuestion}
+        onQuestionUpdated={fetchQuiz}
+      />
       {/* Confirm Delete Modal */}
       <ConfirmDelete
         isOpen={isDeleteModalOpen}

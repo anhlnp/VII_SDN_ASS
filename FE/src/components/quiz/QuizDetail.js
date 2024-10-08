@@ -110,6 +110,7 @@ const QuizDetail = () => {
       <Description>{quiz.description}</Description>
 
       <h3>Questions</h3>
+      <AddQuestionToQuiz quizId={quiz._id} onQuestionAdded={fetchQuiz} />
       {quiz.questions.length === 0 ? (
         <p>No questions available for this quiz.</p>
       ) : (
@@ -144,7 +145,7 @@ const QuizDetail = () => {
         </QuestionList>
       )}
 
-      <AddQuestionToQuiz quizId={quiz._id} onQuestionAdded={fetchQuiz} />
+      
 
       {/* Edit Question Modal */}
       <Modal

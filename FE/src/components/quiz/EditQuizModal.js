@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import Button from '../../styles/Button';
@@ -43,24 +43,27 @@ const ButtonGroup = styled.div`
   gap: 10px;
 `;
 
-// Refactored AddQuiz component
-const AddQuiz = ({ isOpen, onClose, onAddQuiz }) => {
+// Refactored EditQuiz component
+const EditQuizModal = ({ isOpen, onClose, quizData, onUpdateQuiz }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    if (quizData) {
+      setTitle(quizData.title);
+      setDescription(quizData.description);
+    }
+  }, [quizData]);
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const quizData = { title, description };
+    const updatedQuizData = { title, description };
     try {
-      await onAddQuiz(quizData); // Calls the passed prop to create quiz
-      // Optionally close the modal after submission
-      onClose();
-      // Clear form
-      setTitle('');
-      setDescription('');
+      await onUpdateQuiz(quizData._id, updatedQuizData); // Calls the passed prop to update the quiz
+      onClose(); // Close modal after submission
     } catch (error) {
-      console.error('Failed to add quiz', error);
+      console.error('Failed to update quiz', error);
     }
   };
 
@@ -68,10 +71,10 @@ const AddQuiz = ({ isOpen, onClose, onAddQuiz }) => {
     <StyledModal
       isOpen={isOpen}
       onRequestClose={onClose}
-      contentLabel="Add Quiz Modal"
+      contentLabel="Edit Quiz Modal"
       ariaHideApp={false}
     >
-      <h2>Create New Quiz</h2>
+      <h2>Edit Quiz</h2>
       <form onSubmit={handleSubmit}>
         <Input
           type="text"
@@ -85,7 +88,7 @@ const AddQuiz = ({ isOpen, onClose, onAddQuiz }) => {
           placeholder="Quiz Description"
         />
         <ButtonGroup>
-          <Button type="submit" variant="confirm">Add Quiz</Button>
+          <Button type="submit" variant="confirm">Update Quiz</Button>
           <Button onClick={onClose} variant="delete" style={{ marginLeft: '10px' }}>
             Cancel
           </Button>
@@ -95,4 +98,4 @@ const AddQuiz = ({ isOpen, onClose, onAddQuiz }) => {
   );
 };
 
-export default AddQuiz;
+export default EditQuizModal;

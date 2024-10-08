@@ -13,15 +13,15 @@ const StyledButton = styled.button`
   margin: 2px;
 
   // Default style (e.g., Confirm/Submit)
-  background-color: #007bff;
+  background-color: #333;
   color: #fff;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #555;
   }
 
   &:active {
-    background-color: #004085;
+    background-color: #222;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
   }
 
@@ -65,12 +65,12 @@ const StyledButton = styled.button`
   ${({ variant }) =>
     variant === 'submit' &&
     css`
-      background-color: #007bff;
+      background-color: #333;
       &:hover {
-        background-color: #0056b3;
+        background-color: #555;
       }
       &:active {
-        background-color: #004085;
+        background-color: #222;
       }
     `}
 `;

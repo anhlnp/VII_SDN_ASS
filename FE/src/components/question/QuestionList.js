@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Modal from "react-modal";
+import Modal from 'react-modal';
 import { getQuestions, deleteQuestion } from '../../services/api';
 import EditQuestion from './EditQuestion';
+import ConfirmDelete from '../ConfirmDelete';
 import Button from '../../styles/Button';
+
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -17,7 +19,6 @@ const Title = styled.h1`
   text-align: center;
   margin-bottom: 20px;
 `;
-
 
 const QuestionItem = styled.li`
   margin: 15px 0;
@@ -41,7 +42,8 @@ const ButtonGroup = styled.div`
 
 const QuestionList = () => {
   const [questions, setQuestions] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State to manage modal visibility
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
 
   useEffect(() => {
@@ -56,13 +58,23 @@ const QuestionList = () => {
     fetchQuestions();
   }, []);
 
-  const handleDelete = async (questionId) => {
+  const handleDeleteClick = (question) => {
+    setCurrentQuestion(question);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await deleteQuestion(questionId);
-      setQuestions(questions.filter(question => question._id !== questionId));
+      await deleteQuestion(currentQuestion._id);
+      setQuestions(questions.filter(question => question._id !== currentQuestion._id));
     } catch (error) {
       console.error('Failed to delete question', error);
     }
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   const openEditModal = (question) => {
@@ -75,7 +87,6 @@ const QuestionList = () => {
   };
 
   const handleQuestionUpdated = () => {
-    // Refresh the questions list after updating a question
     const fetchUpdatedQuestions = async () => {
       try {
         const response = await getQuestions();
@@ -91,14 +102,13 @@ const QuestionList = () => {
   return (
     <Container>
       <Title>Questions</Title>
-      {/* <Button onClick={() => >Add Question</Button> */}
       <ul>
         {questions.map(question => (
           <QuestionItem key={question._id}>
             <QuestionText>{question.text}</QuestionText>
             <ButtonGroup>
-              {/* <Button onClick={() => openEditModal(question)}>Edit</Button> */}
-              <Button onClick={() => handleDelete(question._id)} variant='delete'>Delete</Button>
+              <Button onClick={() => openEditModal(question)}>Edit</Button>
+              <Button onClick={() => handleDeleteClick(question)} variant='delete'>Delete</Button>
             </ButtonGroup>
           </QuestionItem>
         ))}
@@ -126,9 +136,17 @@ const QuestionList = () => {
           <EditQuestion
             question={currentQuestion}
             onQuestionUpdated={handleQuestionUpdated}
+            isOpen={isEditModalOpen}
+            toggleModal={closeEditModal}
           />
         )}
       </Modal>
+      <ConfirmDelete
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        message={`Are you sure you want to delete <strong>${currentQuestion?.text}</strong>?`}
+      />
     </Container>
   );
 };

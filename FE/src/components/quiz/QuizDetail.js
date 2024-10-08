@@ -6,6 +6,8 @@ import EditQuestion from "../question/EditQuestion";
 import styled from "styled-components";
 import Modal from "react-modal";
 import Button from "../../styles/Button";
+import ConfirmDelete from "../ConfirmDelete";
+
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -45,7 +47,6 @@ const OptionList = styled.ul`
 `;
 
 const OptionItem = styled.li`
-  list-style-type: space-counter;
   margin: 5px 0;
 `;
 
@@ -64,7 +65,8 @@ const QuizDetail = () => {
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // State to manage modal visibility
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(null);
 
   const fetchQuiz = async () => {
@@ -82,22 +84,32 @@ const QuizDetail = () => {
     fetchQuiz();
   }, [id]);
 
-  const handleDeleteQuestion = async (questionId) => {
+  const handleDeleteClick = (question) => {
+    setCurrentQuestion(question);  // Set the question to be deleted
+    setIsDeleteModalOpen(true);    // Open the delete confirmation modal
+  };
+
+  const handleConfirmDelete = async () => {
     try {
-      await deleteQuestion(questionId);
+      await deleteQuestion(currentQuestion._id);  // Use the correct question ID
       fetchQuiz(); // Refresh quiz details after deleting a question
     } catch (error) {
       console.error("Failed to delete question", error);
     }
+    setIsDeleteModalOpen(false); // Close the confirmation modal
+  };
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   const openEditModal = (question) => {
-    setCurrentQuestion(question);
-    setIsEditModalOpen(true);
+    setCurrentQuestion(question);  // Set the current question for editing
+    setIsEditModalOpen(true);      // Open the edit modal
   };
 
   const closeEditModal = () => {
-    setIsEditModalOpen(false);
+    setIsEditModalOpen(false);     // Close the edit modal
     setEditingQuestionId(null);
   };
 
@@ -134,7 +146,7 @@ const QuizDetail = () => {
                   Edit
                 </Button>
                 <Button
-                  onClick={() => handleDeleteQuestion(question._id)}
+                  onClick={() => handleDeleteClick(question)}
                   variant="delete"
                 >
                   Delete
@@ -144,8 +156,6 @@ const QuizDetail = () => {
           ))}
         </QuestionList>
       )}
-
-      
 
       {/* Edit Question Modal */}
       <Modal
@@ -179,6 +189,14 @@ const QuizDetail = () => {
           />
         )}
       </Modal>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmDelete
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        message={`Are you sure you want to delete <strong>${currentQuestion?.text}</strong>?`}
+      />
     </Container>
   );
 };

@@ -123,8 +123,8 @@ const EditQuestion = ({ question, onQuestionUpdated, isOpen, toggleModal }) => {
           />
         </label>
 
-        <Button type="submit">Update Question</Button>
-        <Button type="button" onClick={toggleModal} style={{ marginLeft: '10px' }}>
+        <Button type="submit" variant='confirm'>Update Question</Button>
+        <Button type="button" onClick={toggleModal} style={{ marginLeft: '10px' }} variant='cancel'>
           Cancel
         </Button>
       </form>

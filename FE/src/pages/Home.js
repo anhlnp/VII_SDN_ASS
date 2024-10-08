@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
+import Button from '../styles/Button';
 // Styled components
 const Container = styled.div`
   padding: 20px;
@@ -38,14 +38,14 @@ const Home = () => {
       <Title>Home Page</Title>
       
       {/* Button to navigate to the Quiz Page */}
-      <StyledButton onClick={() => navigate('/quizzes')}>
+      <Button onClick={() => navigate('/quizzes')}>
         Go to Quizzes
-      </StyledButton>
+      </Button>
 
       {/* Button to navigate to the Question Page */}
-      <StyledButton onClick={() => navigate('/questions')}>
+      <Button onClick={() => navigate('/questions')}>
         Go to Questions
-      </StyledButton>
+      </Button>
     </Container>
   );
 };

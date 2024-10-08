@@ -162,7 +162,7 @@ const AddQuestionToQuiz = ({ quizId, onQuestionAdded }) => {
             placeholder="Enter keywords (e.g., keyword1, keyword2)"
           />
 
-          <Button type="submit" variant="submit">Add Question</Button>
+          <Button type="submit" variant="confirm">Add Question</Button>
           <Button type="button" onClick={toggleModal} variant='delete'>
             Cancel
           </Button>

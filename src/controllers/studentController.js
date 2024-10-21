@@ -4,8 +4,8 @@ const Student = require('../models/Student');
 exports.getInfo = (req, res) => {
     res.json({
         data: {
-            fullName: "Nguyen Hoang Vu",
-            studentCode: "QE170032"
+            fullName: "Lê Nguyễn Phúc Anh",
+            studentCode: "QE170043"
         }
     });
 };
@@ -39,7 +39,7 @@ exports.createStudent = async (req, res) => {
 // Get all students
 exports.getAllStudents = async (req, res) => {
     try {
-        const students = await Student.find();
+        const students = await Student.find().select('name studentCode isActive');
         res.status(200).json({
             success: true,
             data: students
@@ -55,7 +55,7 @@ exports.getAllStudents = async (req, res) => {
 // Get a student by ID
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id);
+        const student = await Student.findById(req.params.id).select('name studentCode isActive');
         if (!student) return res.status(404).json({ success: false, message: "Student not found" });
         res.status(200).json({ success: true, data: student });
     } catch (error) {
@@ -66,14 +66,20 @@ exports.getStudentById = async (req, res) => {
 // Update a student
 exports.updateStudent = async (req, res) => {
     try {
-        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        // Tìm và cập nhật student theo id, trả về các thuộc tính cần thiết
+        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('name studentCode isActive');
+        
+        // Nếu không tìm thấy student
         if (!student) return res.status(404).json({ success: false, message: "Student not found" });
+        
+        // Trả về kết quả thành công
         res.status(200).json({
             success: true,
             message: "Student updated successfully",
             data: student
         });
     } catch (error) {
+        // Trả về lỗi nếu có vấn đề
         res.status(400).json({ success: false, message: error.message });
     }
 };
@@ -81,13 +87,27 @@ exports.updateStudent = async (req, res) => {
 // Delete a student
 exports.deleteStudent = async (req, res) => {
     try {
+        // Tìm và xóa student theo ID
         const student = await Student.findByIdAndDelete(req.params.id);
-        if (!student) return res.status(404).json({ success: false, message: "Student not found" });
+        
+        // Kiểm tra nếu không tìm thấy student
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: "Student not found"
+            });
+        }
+
+        // Trả về kết quả thành công nếu đã xóa
         res.status(200).json({
             success: true,
             message: "Student deleted successfully"
         });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Something went wrong on the server" });
+        // Trả về lỗi nếu có vấn đề trong quá trình xử lý
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong on the server"
+        });
     }
 };

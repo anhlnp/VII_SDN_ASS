@@ -13,49 +13,57 @@ exports.getInfo = (req, res) => {
 // POST Create a student
 exports.createStudent = async (req, res) => {
     try {
-        const student = new Student(req.body);
-        const { name, studentCode, isActive } = student;
-        await student.save();
-
-        const responseData = {
-            name,
-            studentCode,
-            isActive
-        };
-        
-        res.status(201).json({
-            success: true,
-            message: "Student created successfully",
-            data: student
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: error.message,
-        });
+      const { name, studentCode, isActive } = req.body;
+      const newStudent = await Student.create({
+        fullName: name, // Lưu 'name' thành 'fullName' trong MongoDB
+        studentCode,
+        isActive,
+      });
+  
+      res.status(201).json({
+        success: true,
+        message: "Student created successfully",
+        data: {
+          _id: newStudent._id,
+          name: newStudent.fullName, // Đổi tên trường từ 'fullName' thành 'name'
+          studentCode: newStudent.studentCode,
+          isActive: newStudent.isActive,
+        },
+      });
+    } catch (err) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid student code format",
+      });
     }
-};
+  };
 
 // Get all students
 exports.getAllStudents = async (req, res) => {
     try {
-        const students = await Student.find().select('name studentCode isActive');
-        res.status(200).json({
-            success: true,
-            data: students
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong on the server"
-        });
+      const students = await Student.find({});
+      const formattedStudents = students.map((student) => ({
+        _id: student._id,
+        name: student.fullName, 
+        studentCode: student.studentCode,
+        isActive: student.isActive,
+      }));
+      res.status(200).json({
+        success: true,
+        data: formattedStudents, 
+      });
+    } catch {
+      res.status(500).json({
+        success: false,
+        message: "Something went wrong on the server",
+      });
     }
-};
+  };
 
 // Get a student by ID
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id).select('name studentCode isActive');
+        const student = await Student.findById(req.params.id).select('fullName studentCode isActive');
         if (!student) return res.status(404).json({ success: false, message: "Student not found" });
         res.status(200).json({ success: true, data: student });
     } catch (error) {
@@ -67,7 +75,7 @@ exports.getStudentById = async (req, res) => {
 exports.updateStudent = async (req, res) => {
     try {
         // Tìm và cập nhật student theo id, trả về các thuộc tính cần thiết
-        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('name studentCode isActive');
+        const student = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('fullName studentCode isActive');
         
         // Nếu không tìm thấy student
         if (!student) return res.status(404).json({ success: false, message: "Student not found" });
